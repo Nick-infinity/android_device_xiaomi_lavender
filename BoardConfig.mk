@@ -173,5 +173,8 @@ PRODUCT_FULL_TREBLE_OVERRIDE := true
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
 
+# Telephony
+TARGET_USES_ALTERNATIVE_MANUAL_NETWORK_SELECT := true
+
 # inherit from the proprietary version
 -include vendor/xiaomi/lavender/BoardConfigVendor.mk
