@@ -34,9 +34,6 @@ PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay
 
-# Properties
--include $(LOCAL_PATH)/system-props.mk
-
 # Audio
 PRODUCT_PACKAGES += \
     audio.a2dp.default \
@@ -70,8 +67,9 @@ PRODUCT_PACKAGES += \
     libqcomfm_jni \
     qcom.fmradio
 	
-# GoogleCamera
-$(call inherit-product, packages/apps/GoogleCameraMod/config.mk)
+# Camera
+PRODUCT_PACKAGES += \
+    Snap2
 
 # HIDL
 PRODUCT_PACKAGES += \
