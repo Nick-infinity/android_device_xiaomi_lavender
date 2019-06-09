@@ -25,25 +25,23 @@
 #define LEDS            "/sys/class/leds/"
 
 #define LCD_LED         LEDS "lcd-backlight/"
-#define RED_LED       LEDS "red/"
+#define WHITE_LED       LEDS "red/"
 
 #define BLINK           "blink"
 #define BRIGHTNESS      "brightness"
+#define MAX_BRIGHTNESS  "max_brightness"
 #define DUTY_PCTS       "duty_pcts"
 #define PAUSE_HI        "pause_hi"
 #define PAUSE_LO        "pause_lo"
 #define RAMP_STEP_MS    "ramp_step_ms"
 #define START_IDX       "start_idx"
 
-#define MAX_LED_BRIGHTNESS    255
-#define MAX_LCD_BRIGHTNESS    255
-
 /*
- * 8 duty percent steps.
+ * 15 duty percent steps.
  */
 #define RAMP_STEPS 15
 /*
- * Each step will stay on for 50ms by default.
+ * Each step will stay on for 150ms by default.
  */
 #define RAMP_STEP_DURATION 150
 /*
@@ -68,6 +66,25 @@ static void set(std::string path, std::string value) {
 
 static void set(std::string path, int value) {
     set(path, std::to_string(value));
+}
+
+static int get(std::string path) {
+    std::ifstream file(path);
+    int value;
+
+    if (!file.is_open()) {
+        ALOGW("failed to read from %s", path.c_str());
+        return 0;
+    }
+
+    file >> value;
+    return value;
+}
+
+static int getMaxBrightness(std::string path) {
+    int value = get(path);
+    ALOGW("Got max brightness %d", value);
+    return value;
 }
 
 static uint32_t getBrightness(const LightState& state) {
@@ -101,8 +118,8 @@ static inline uint32_t getScaledBrightness(const LightState& state, uint32_t max
     return scaleBrightness(getBrightness(state), maxBrightness);
 }
 
-static void handleBacklight(Type /* type */, const LightState& state) {
-    uint32_t brightness = getScaledBrightness(state, MAX_LCD_BRIGHTNESS);
+static void handleBacklight(const LightState& state) {
+    uint32_t brightness = getScaledBrightness(state, getMaxBrightness(LCD_LED MAX_BRIGHTNESS));
     set(LCD_LED BRIGHTNESS, brightness);
 }
 
@@ -121,11 +138,11 @@ static std::string getScaledRamp(uint32_t brightness) {
     return ramp;
 }
 
-static void setNotification(const LightState& state) {
-    uint32_t redBrightness = getScaledBrightness(state, MAX_LED_BRIGHTNESS);
+static void handleNotification(const LightState& state) {
+    uint32_t whiteBrightness = getScaledBrightness(state, getMaxBrightness(WHITE_LED MAX_BRIGHTNESS));
 
     /* Disable blinking */
-    set(RED_LED BLINK, 0);
+    set(WHITE_LED BLINK, 0);
 
     if (state.flashMode == Flash::TIMED) {
         /*
@@ -142,17 +159,17 @@ static void setNotification(const LightState& state) {
             pauseHi = 0;
         }
 
-        /* Red */
-        set(RED_LED START_IDX, 0 * RAMP_STEPS);
-        set(RED_LED DUTY_PCTS, getScaledRamp(redBrightness));
-        set(RED_LED PAUSE_LO, pauseLo);
-        set(RED_LED PAUSE_HI, pauseHi);
-        set(RED_LED RAMP_STEP_MS, stepDuration);
+        /* White */
+        set(WHITE_LED START_IDX, 0 * RAMP_STEPS);
+        set(WHITE_LED DUTY_PCTS, getScaledRamp(whiteBrightness));
+        set(WHITE_LED PAUSE_LO, pauseLo);
+        set(WHITE_LED PAUSE_HI, pauseHi);
+        set(WHITE_LED RAMP_STEP_MS, stepDuration);
 
         /* Enable blinking */
-        set(RED_LED BLINK, 1);
+        set(WHITE_LED BLINK, 1);
     } else {
-        set(RED_LED BRIGHTNESS, redBrightness);
+        set(WHITE_LED BRIGHTNESS, whiteBrightness);
     }
 }
 
@@ -160,43 +177,15 @@ static inline bool isLit(const LightState& state) {
     return state.color & 0x00ffffff;
 }
 
-/*
- * Keep sorted in the order of importance.
- */
-static const LightState offState = {};
-static std::vector<std::pair<Type, LightState>> notificationStates = {
-    { Type::ATTENTION, offState },
-    { Type::NOTIFICATIONS, offState },
-    { Type::BATTERY, offState },
-};
-
-static void handleNotification(Type type, const LightState& state) {
-    bool handled = false;
-
-    for(auto it : notificationStates) {
-        if (it.first == type) {
-            it.second = state;
-        }
-
-        if  (!handled && isLit(it.second)) {
-            setNotification(it.second);
-            handled = true;
-        }
-    }
-
-    if (!handled) {
-        setNotification(offState);
-    }
-}
-
-static std::map<Type, std::function<void(Type type, const LightState&)>> lights = {
+/* Keep sorted in the order of importance. */
+static std::vector<LightBackend> backends = {
     { Type::ATTENTION, handleNotification },
     { Type::NOTIFICATIONS, handleNotification },
     { Type::BATTERY, handleNotification },
     { Type::BACKLIGHT, handleBacklight },
 };
 
-} // anonymous namespace
+}  // anonymous namespace
 
 namespace android {
 namespace hardware {
@@ -205,18 +194,34 @@ namespace V2_0 {
 namespace implementation {
 
 Return<Status> Light::setLight(Type type, const LightState& state) {
-    auto it = lights.find(type);
+    LightStateHandler handler = nullptr;
 
-    if (it == lights.end()) {
+    /* Lock global mutex until light state is updated. */
+    std::lock_guard<std::mutex> lock(globalLock);
+
+    /* Update the cached state value for the current type. */
+    for (LightBackend& backend : backends) {
+        if (backend.type == type) {
+            backend.state = state;
+            handler = backend.handler;
+        }
+    }
+
+    /* If no handler has been found, then the type is not supported. */
+    if (!handler) {
         return Status::LIGHT_NOT_SUPPORTED;
     }
 
-    /*
-     * Lock global mutex until light state is updated.
-     */
-    std::lock_guard<std::mutex> lock(globalLock);
+    /* Light up the type with the highest priority that matches the current handler. */
+    for (LightBackend& backend : backends) {
+        if (handler == backend.handler && isLit(backend.state)) {
+            handler(backend.state);
+            return Status::SUCCESS;
+        }
+    }
 
-    it->second(type, state);
+    /* If no type has been lit up, then turn off the hardware. */
+    handler(state);
 
     return Status::SUCCESS;
 }
@@ -224,8 +229,8 @@ Return<Status> Light::setLight(Type type, const LightState& state) {
 Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
     std::vector<Type> types;
 
-    for (auto const& light : lights) {
-        types.push_back(light.first);
+    for (const LightBackend& backend : backends) {
+        types.push_back(backend.type);
     }
 
     _hidl_cb(types);

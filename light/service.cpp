@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "android.hardware.light@2.0-service.xiaomi_sdm660"
+#define LOG_TAG "android.hardware.light@2.0-service.sdm660"
 
 #include <hidl/HidlTransportSupport.h>
 
@@ -31,7 +31,7 @@ using android::sp;
 using android::status_t;
 
 int main() {
-    android::sp<ILight> service = new Light();
+    sp<ILight> service = new Light();
 
     configureRpcThreadpool(1, true);
 
