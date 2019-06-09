@@ -272,3 +272,5 @@ persist.vendor.ssr.restart_level=ALL_ENABLE
 
 #thermal configs path
 sys.thermal.data.path=/data/vendor/thermal/
+
+ro.sf.lcd_density=440
