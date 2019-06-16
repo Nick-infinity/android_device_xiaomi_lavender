@@ -68,10 +68,6 @@ PRODUCT_PACKAGES += \
     libqcomfm_jni \
     qcom.fmradio
 	
-# Camera
-PRODUCT_PACKAGES += \
-    Snap2
-
 # HIDL
 PRODUCT_PACKAGES += \
     android.hidl.base@1.0 \
