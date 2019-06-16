@@ -1,1 +1,1 @@
-add_lunch_combo beast_lavender-userdebug
+add_lunch_combo aosp_lavender-userdebug
