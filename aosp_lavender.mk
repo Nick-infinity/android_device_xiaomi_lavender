@@ -21,11 +21,12 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from jason device
 $(call inherit-product, device/xiaomi/lavender/device.mk)
 
-# Inherit some common BeastROMs stuff.
-TARGET_BOOT_ANIMATION_RES := 1080
-$(call inherit-product, vendor/beast/config/common.mk)
+# Inherit some common PE stuff.
+$(call inherit-product, vendor/aosp/config/common_full_phone.mk)
+TARGET_BOOT_ANIMATION_RES :=1080
+TARGET_GAPPS_ARCH := arm64
 
-PRODUCT_NAME := beast_lavender
+PRODUCT_NAME := aosp_lavender
 PRODUCT_BRAND := Xiaomi
 PRODUCT_DEVICE := lavender
 PRODUCT_MANUFACTURER := Xiaomi
