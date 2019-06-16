@@ -59,7 +59,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libvulkan \
     libqdMetaData.system \
-    libdisplayconfig
+    libdisplayconfig \
+    vendor.display.config@1.0
 
 # FM
 PRODUCT_PACKAGES += \
@@ -151,3 +152,10 @@ PRODUCT_PACKAGES += \
 # OTA
 PRODUCT_PACKAGES += \
     Updates
+	
+# WiFi Display
+PRODUCT_PACKAGES += \
+    libnl
+
+PRODUCT_BOOT_JARS += \
+    WfdCommon
