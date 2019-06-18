@@ -174,6 +174,7 @@ ro.vendor.sensors.pug = true
 #Expose aux camera for below packages
 camera.aux.packagelist=org.codeaurora.snapcam,com.android.camera,com.qualcomm.qti.qmmi,com.longcheertel.cit
 vendor.camera.aux.packagelist=org.codeaurora.snapcam,com.android.camera,com.qualcomm.qti.qmmi,com.longcheertel.cit
+camera.hal1.packagelist=com.whatsapp,com.facebook.katana,com.instagram.android,com.snapchat.android,com.gbwhatsapp
 
 # enable b-services aging propagation
 ro.vendor.qti.sys.fw.bservice_enable=true
