@@ -139,12 +139,6 @@ vendor/etc/camera/megviifacepp_model
 vendor/etc/camera/model_back.dlc
 vendor/etc/camera/model_front.dlc
 vendor/etc/camera/sdm_ys_32p_120_21_5_perturb50.bin
-vendor/lib/hw/camera.sdm660.so
-vendor/lib/libmmcamera_interface.so
-vendor/lib/libmmjpeg_interface.so
-vendor/lib/libqomx_core.so
-vendor/lib/lib_lowlight.so
-vendor/lib/libarcsoft_beautyshot.so
 vendor/lib/libarcsoft_dualcam_refocus.so
 vendor/lib/libarcsoft_high_dynamic_range.so
 vendor/lib/libarcsoft_supernight.so
@@ -152,7 +146,6 @@ vendor/lib/libcdsprpc.so
 vendor/lib/libcamera_scene.so
 vendor/lib/libc++_shared.so
 vendor/lib/libdepthmapwrapper.so
-vendor/lib/libFaceGrade.so
 vendor/lib/libflash_pmic.so
 vendor/lib/libhal_dbg.so
 vendor/lib/libjpegdhw.so
@@ -166,10 +159,7 @@ vendor/lib/libSonyIMX376KRmscLibrary.so
 vendor/lib/libsymphony-cpu.so
 vendor/lib/libsymphonypower.so
 vendor/lib/libvidhance.so
-vendor/lib/libVDClearShot.so
 vendor/lib/libVDSuperPhotoAPI.so
-vendor/lib/libmibokeh_660.so
-vendor/lib/libmm-qcamera.so
 vendor/lib/libmmlib2d_interface.so
 vendor/lib/libmmcamera_dbg.so
 vendor/lib/libmmcamera_dummyalgo.so
@@ -237,8 +227,6 @@ vendor/lib/libscvePanorama.so
 vendor/lib/libscvePanorama_lite.so
 vendor/lib/libvideoutils.so
 vendor/lib/libvidhance_gyro.so
-vendor/lib/libXMFD_AgeGender.so
-vendor/lib/mibokeh_660_opencl.bin
 vendor/lib64/libcdsprpc.so
 vendor/lib64/libmmcamera2_frame_algorithm.so
 vendor/lib64/libmmcamera2_is.so
@@ -262,6 +250,8 @@ vendor/lib64/libscveObjectTracker_stub.so
 vendor/lib64/libscvePanorama.so
 vendor/lib64/libscvePanorama_lite.so
 vendor/lib64/libvideoutils.so
+vendor/lib/libts_detected_face_hal.so
+vendor/lib/libts_face_beautify_hal.so
 
 # Camera actuators
 vendor/lib/libactuator_lavender_imx486_ofilm_i_bu64982.so
