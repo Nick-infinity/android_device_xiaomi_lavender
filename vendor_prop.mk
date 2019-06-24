@@ -91,3 +91,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.adb.secure=0 \
 	ro.secure=0 \
   ro.debuggable=1
+
+# ART
+PRODUCT_PROPERTY_OVERRIDES += \
+dalvik.vm.dex2oat-filter=speed \
+dalvik.vm.image-dex2oat-filter=speed
