@@ -1564,7 +1564,7 @@ vendor/lib/libperipheral_client.so
 vendor/lib64/libperipheral_client.so
 
 # Power-off charging daemon
--sbin/charger:sbin/chargeonlymode;rootfs
+-sbin/charger:sbin/chargeonlymode;rootfs|f048d2cc20783ba1a608b73d440b3053af6ec9fd
 
 # Postprocessing
 vendor/bin/hw/vendor.display.color@1.0-service
